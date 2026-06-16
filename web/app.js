@@ -97,6 +97,7 @@ import { SignatureManager } from "web-signature_manager";
 import { Toolbar } from "web-toolbar";
 import { ViewHistory } from "./view_history.js";
 import { ViewsManager } from "web-views_manager";
+import { OcrManager } from "web-ocr_manager";
 
 const FORCE_PAGES_LOADED_TIMEOUT = 10000; // ms
 
@@ -413,10 +414,10 @@ const PDFViewerApplication = {
     const eventBus =
       typeof PDFJSDev !== "undefined" && PDFJSDev.test("MOZCENTRAL")
         ? new FirefoxEventBus(
-            AppOptions.get("allowedGlobalEvents"),
-            externalServices,
-            AppOptions.get("isInAutomation")
-          )
+          AppOptions.get("allowedGlobalEvents"),
+          externalServices,
+          AppOptions.get("isInAutomation")
+        )
         : new EventBus();
     this.eventBus = AppOptions.eventBus = eventBus;
 
@@ -460,9 +461,9 @@ const PDFViewerApplication = {
       window.matchMedia("(forced-colors: active)").matches;
     const pageColors = hasForcedColors
       ? {
-          background: AppOptions.get("pageColorsBackground"),
-          foreground: AppOptions.get("pageColorsForeground"),
-        }
+        background: AppOptions.get("pageColorsBackground"),
+        foreground: AppOptions.get("pageColorsForeground"),
+      }
       : null;
     const enableMerge = AppOptions.get("enableMerge");
     const enableSplitMerge = AppOptions.get("enableSplitMerge");
@@ -471,19 +472,19 @@ const PDFViewerApplication = {
     if (AppOptions.get("enableUpdatedAddImage")) {
       altTextManager = appConfig.newAltTextDialog
         ? new NewAltTextManager(
-            appConfig.newAltTextDialog,
-            overlayManager,
-            eventBus
-          )
+          appConfig.newAltTextDialog,
+          overlayManager,
+          eventBus
+        )
         : null;
     } else {
       altTextManager = appConfig.altTextDialog
         ? new AltTextManager(
-            appConfig.altTextDialog,
-            container,
-            overlayManager,
-            eventBus
-          )
+          appConfig.altTextDialog,
+          container,
+          overlayManager,
+          eventBus
+        )
         : null;
     }
 
@@ -494,50 +495,50 @@ const PDFViewerApplication = {
     const signatureManager =
       AppOptions.get("enableSignatureEditor") && appConfig.addSignatureDialog
         ? new SignatureManager(
-            appConfig.addSignatureDialog,
-            appConfig.editSignatureDialog,
-            appConfig.annotationEditorParams?.editorSignatureAddSignature ||
-              null,
-            overlayManager,
-            l10n,
-            externalServices.createSignatureStorage(eventBus, abortSignal),
-            eventBus
-          )
+          appConfig.addSignatureDialog,
+          appConfig.editSignatureDialog,
+          appConfig.annotationEditorParams?.editorSignatureAddSignature ||
+          null,
+          overlayManager,
+          l10n,
+          externalServices.createSignatureStorage(eventBus, abortSignal),
+          eventBus
+        )
         : null;
 
     const commentManager =
       AppOptions.get("enableComment") && appConfig.editCommentDialog
         ? new CommentManager(
-            appConfig.editCommentDialog,
-            {
-              learnMoreUrl: AppOptions.get("commentLearnMoreUrl"),
-              sidebar:
-                appConfig.annotationEditorParams?.editorCommentsSidebar || null,
-              sidebarResizer:
-                appConfig.annotationEditorParams
-                  ?.editorCommentsSidebarResizer || null,
-              commentsList:
-                appConfig.annotationEditorParams?.editorCommentsSidebarList ||
-                null,
-              commentCount:
-                appConfig.annotationEditorParams?.editorCommentsSidebarCount ||
-                null,
-              sidebarTitle:
-                appConfig.annotationEditorParams?.editorCommentsSidebarTitle ||
-                null,
-              closeButton:
-                appConfig.annotationEditorParams
-                  ?.editorCommentsSidebarCloseButton || null,
-              commentToolbarButton:
-                appConfig.toolbar?.editorCommentButton || null,
-            },
-            eventBus,
-            linkService,
-            overlayManager,
+          appConfig.editCommentDialog,
+          {
+            learnMoreUrl: AppOptions.get("commentLearnMoreUrl"),
+            sidebar:
+              appConfig.annotationEditorParams?.editorCommentsSidebar || null,
+            sidebarResizer:
+              appConfig.annotationEditorParams
+                ?.editorCommentsSidebarResizer || null,
+            commentsList:
+              appConfig.annotationEditorParams?.editorCommentsSidebarList ||
+              null,
+            commentCount:
+              appConfig.annotationEditorParams?.editorCommentsSidebarCount ||
+              null,
+            sidebarTitle:
+              appConfig.annotationEditorParams?.editorCommentsSidebarTitle ||
+              null,
+            closeButton:
+              appConfig.annotationEditorParams
+                ?.editorCommentsSidebarCloseButton || null,
+            commentToolbarButton:
+              appConfig.toolbar?.editorCommentButton || null,
+          },
+          eventBus,
+          linkService,
+          overlayManager,
             /* ltr = */ l10n.getDirection() === "ltr",
-            hasForcedColors,
-            abortSignal
-          )
+          hasForcedColors,
+          abortSignal
+        )
         : null;
 
     const maxCanvasPixels = AppOptions.get("maxCanvasPixels"),
@@ -671,8 +672,8 @@ const PDFViewerApplication = {
         overlayManager,
         eventBus,
         l10n,
-        /* fileNameLookup = */ () => this._docFilename,
-        /* titleLookup = */ () => this._docTitle
+        /* fileNameLookup = */() => this._docFilename,
+        /* titleLookup = */() => this._docTitle
       );
     }
 
@@ -803,6 +804,8 @@ const PDFViewerApplication = {
         eventBus
       );
     }
+
+    this.ocrManager = new OcrManager(appConfig.mainContainer, this.pdfViewer);
   },
 
   async run(config) {
@@ -996,7 +999,7 @@ const PDFViewerApplication = {
       this,
       "supportsPrinting",
       AppOptions.get("supportsPrinting") &&
-        PDFPrintServiceFactory.supportsPrinting
+      PDFPrintServiceFactory.supportsPrinting
     );
   },
 
@@ -1179,7 +1182,7 @@ const PDFViewerApplication = {
             null
           );
           (window.__worker_coverage__ ??= []).push(workerCoverage);
-        } catch {}
+        } catch { }
       }
     }
     const promises = [];
@@ -1806,9 +1809,9 @@ const PDFViewerApplication = {
     // Provides some basic debug information
     console.log(
       `PDF ${pdfDocument.fingerprints[0]} [${info.PDFFormatVersion} ` +
-        `${(metadata?.get("pdf:producer") || info.Producer || "-").trim()} / ` +
-        `${(metadata?.get("xmp:creatortool") || info.Creator || "-").trim()}` +
-        `] (PDF.js: ${version || "?"} [${build || "?"}])`
+      `${(metadata?.get("pdf:producer") || info.Producer || "-").trim()} / ` +
+      `${(metadata?.get("xmp:creatortool") || info.Creator || "-").trim()}` +
+      `] (PDF.js: ${version || "?"} [${build || "?"}])`
     );
     const pdfTitle = this._docTitle;
 
@@ -2254,6 +2257,32 @@ const PDFViewerApplication = {
         opts
       );
     }
+
+    eventBus.on("documentloaded", () => {
+      document.getElementById("OCRSelectButton").disabled = false;
+    }, opts);
+
+    eventBus.on("documenterror", () => {
+      document.getElementById("OCRSelectButton").disabled = true;
+      this.ocrManager?.deactivate();
+    }, opts);
+
+    eventBus.on("documentinit", () => {
+      this.ocrManager?.deactivate();
+    }, opts);
+
+    eventBus.on("cursortoolchanged", () => {
+      this.ocrManager?.deactivate();
+    }, opts);
+
+    eventBus.on("switchannotationeditormode", () => {
+      this.ocrManager?.deactivate();
+    }, opts);
+
+    document.getElementById("OCRSelectButton")?.addEventListener("click", () => {
+      this.ocrManager.toggle();
+    });
+
     eventBus.on("pagesedited", this.onPagesEdited.bind(this), opts);
     eventBus.on("saveextractedpages", this.onSavePages.bind(this), opts);
     eventBus.on("saveandload", this.onSaveAndLoad.bind(this), opts);
@@ -2515,7 +2544,7 @@ const PDFViewerApplication = {
     document.blockUnblockOnload?.(false);
 
     // Ensure that this method is only ever run once.
-    this._unblockDocumentLoadEvent = () => {};
+    this._unblockDocumentLoadEvent = () => { };
   },
 
   /**

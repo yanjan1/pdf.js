@@ -1478,3 +1478,14 @@ dialog :link {
     display: none;
   }
 }
+
+
+#OCRSelectButton::before {
+  -webkit-mask-image: url(images/ocr-icon.svg);
+  mask-image: url(images/ocr-icon.svg);
+}
+
+#OCRSelectButton.toggled {
+  background-color: var(--toggled-btn-bg-color);
+  color: var(--toggled-btn-color);
+}

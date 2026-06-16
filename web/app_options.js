@@ -396,7 +396,7 @@ const defaultOptions = {
   },
   textLayerMode: {
     /** @type {number} */
-    value: 1,
+    value: 0,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
   viewerCssTheme: {
@@ -568,7 +568,7 @@ if (typeof PDFJSDev === "undefined" || !PDFJSDev.test("MOZCENTRAL")) {
     value:
       typeof PDFJSDev !== "undefined" && PDFJSDev.test("CHROME")
         ? ""
-        : "compressed.tracemonkey-pldi-09.pdf",
+        : "",
     kind: OptionKind.VIEWER,
   };
   defaultOptions.sandboxBundleSrc = {

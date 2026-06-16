@@ -84,6 +84,7 @@ See https://github.com/adobe-type-tools/cmap-resources
           "fluent-bundle": "../node_modules/@fluent/bundle/esm/index.js",
           "fluent-dom": "../node_modules/@fluent/dom/esm/index.js",
           "cached-iterable": "../node_modules/cached-iterable/src/index.mjs",
+          "tesseract.js": "../node_modules/tesseract.js/dist/tesseract.esm.min.js",
 
           "display-binary_data_factory": "../src/display/binary_data_factory.js",
           "display-network_stream": "../src/display/network_stream.js",
@@ -108,7 +109,8 @@ See https://github.com/adobe-type-tools/cmap-resources
           "web-secondary_toolbar": "./secondary_toolbar.js",
           "web-signature_manager": "./signature_manager.js",
           "web-toolbar": "./toolbar.js",
-          "web-views_manager": "./views_manager.js"
+          "web-views_manager": "./views_manager.js",
+          "web-ocr_manager": "./ocr_manager.js"
         }
       }
     </script>
@@ -422,6 +424,22 @@ See https://github.com/adobe-type-tools/cmap-resources
                 </span>
               </div>
               <div id="toolbarViewerRight" class="toolbarHorizontalGroup">
+
+                   <div id="OCRSelect" class="toolbarButtonWithContainer">
+                    <button
+                      id="OCRSelectButton"
+                      class="toolbarButton"
+                      type="button"
+                      tabindex="0"
+                      disabled
+                    >
+                      <span>OCR</span>
+                    </button>
+                  </div>
+
+
+                 <div id="editorModeSeparator" class="verticalToolbarSeparator"></div>
+
                 <div id="editorModeButtons" class="toolbarHorizontalGroup">
                   <div id="editorComment" class="toolbarButtonWithContainer" hidden="true">
                     <button
